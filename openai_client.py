@@ -69,6 +69,7 @@ class LLMClient:
             max_output_tokens=500,
         )
         content = _get_output_text(response).strip()
+        content = _last_line(content)
         content = _extract_json(content)
         data = json.loads(content)
         return SummarizeResult.model_validate(data)
@@ -91,9 +92,16 @@ class LLMClient:
             max_output_tokens=300,
         )
         content = _get_output_text(response).strip()
+        content = _last_line(content)
         content = _extract_json(content)
         data = json.loads(content)
         return SentimentResult.model_validate(data)
+
+
+def _last_line(text: str) -> str:
+    """Return the last non-empty line of the response (for JSON-only parsing)."""
+    lines = [ln.strip() for ln in text.strip().splitlines() if ln.strip()]
+    return lines[-1] if lines else text.strip()
 
 
 def _extract_json(text: str) -> str:
