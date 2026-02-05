@@ -12,6 +12,7 @@ from typing import Literal
 
 from openai import OpenAI
 
+# Env var names (values read at runtime via os.environ).
 SUMMARIZE_PROMPT_ID = "SUMMARIZE_PROMPT_ID"
 SENTIMENT_PROMPT_ID = "SENTIMENT_PROMPT_ID"
 SUMMARIZE_PROMPT_VERSION = "SUMMARIZE_PROMPT_VERSION"
