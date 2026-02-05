@@ -64,7 +64,7 @@ class LLMClient:
             raise ValueError(f"{SUMMARIZE_PROMPT_ID} is not set")
         prompt_param: dict = {
             "id": self._summarize_prompt_id,
-            "variables": {"text": text, "max_length": max_length},
+            "variables": {"text": text, "max_length": str(max_length)},
         }
         if self._summarize_version:
             prompt_param["version"] = self._summarize_version
