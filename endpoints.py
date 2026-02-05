@@ -3,6 +3,7 @@
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, HTTPException
+from pydantic import ValidationError
 
 from models import (
     AnalyzeSentimentRequest,
@@ -30,10 +31,12 @@ async def health():
 async def summarize(body: SummarizeRequest):
     """Summarize the given text within the specified max length."""
     try:
-        summary = llm.summarize(body.text, body.max_length)
-        return SummarizeResponse(summary=summary)
+        result = llm.summarize(body.text, body.max_length)
+        return SummarizeResponse(summary=result.summary)
+    except (KeyError, ValueError, ValidationError) as e:
+        raise HTTPException(status_code=502, detail=f"Invalid model response: {str(e)} Please try again.")
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"OpenAI request failed: {str(e)}")
+        raise HTTPException(status_code=502, detail=f"OpenAI request failed: {str(e)} Please try again.")
 
 
 @router.post("/analyze-sentiment", response_model=AnalyzeSentimentResponse)
@@ -46,7 +49,7 @@ async def analyze_sentiment(body: AnalyzeSentimentRequest):
             confidence_score=result.confidence_score,
             explanation=result.explanation,
         )
-    except (KeyError, ValueError) as e:
-        raise HTTPException(status_code=502, detail=f"Invalid model response: {str(e)}")
+    except (KeyError, ValueError, ValidationError) as e:
+        raise HTTPException(status_code=502, detail=f"Invalid model response: {str(e)} Please try again.")
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"OpenAI request failed: {str(e)}")
+        raise HTTPException(status_code=502, detail=f"OpenAI request failed: {str(e)} Please try again.")
